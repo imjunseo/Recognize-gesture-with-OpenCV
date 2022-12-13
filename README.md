@@ -10,6 +10,7 @@ Gesture Recognition with OpenCV
 ## Project outline
 ---
 1. Steps
+
 i. Recognize gestures.
 
 ii. Recognize if fingers are stretched or folded with the image below.
