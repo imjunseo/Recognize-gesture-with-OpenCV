@@ -11,11 +11,14 @@ Gesture Recognition with OpenCV
 ---
 1. Steps
 i. Recognize gestures.
+
 ii. Recognize if fingers are stretched or folded with the image below.
 ![image](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FMqB96%2Fbtq9zjXlfM8%2F9X13A9blJonTdaU7DtokJk%2Fimg.png)
 
 iii. Judge gesture.
+
 iv. Execute a command that matches the gesture.
+
 
 2. Points to Note
 
