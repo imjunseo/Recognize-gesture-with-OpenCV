@@ -17,6 +17,7 @@ iii. Judge gesture.
 iv. Execute a command that matches the gesture.
 
 2. Points to Note
+
 i. We need to know how computers judge our gestures.
 
 ## Requirements(with versions)
