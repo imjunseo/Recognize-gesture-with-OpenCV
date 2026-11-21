@@ -1,34 +1,17 @@
-Gesture Recognition with OpenCV
----
+# 웹캠 손 제스처 인식
 
+OpenCV로 웹캠 영상을 읽고 MediaPipe가 추정한 손 랜드마크를 이용해 손 모양을 분류합니다. 펼친 손, V, 가운데손가락, 엄지 제스처를 손가락 관절과 손목 사이의 거리 관계로 구분하고 화면에 표시합니다.
 
-#### Execute a command with a given gesture
-##### Nice gesture launcher with only opencv and python
-##### We were inspired by this [page](https://google.github.io/mediapipe/solutions/solutions.html) and this [blog](https://dojang.io/mod/page/view.php?id=2393).
+## 실행
 
+Python 3.11과 웹캠이 필요합니다. 가상 환경을 활성화한 뒤 저장소 루트에서 실행하세요.
 
-## Project outline
----
-1. Steps
+```bash
+python -m pip install -r requirements.txt
+python recgnize_gesture.py
+```
 
-i. Recognize gestures.
+영상 창에서 `Q` 또는 `Esc`로 종료합니다. 손이 옆으로 돌아가거나 일부 손가락이 가려지면 거리 규칙에 따라 오인식될 수 있습니다.
 
-ii. Recognize if fingers are stretched or folded with the image below.
-![image](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FMqB96%2Fbtq9zjXlfM8%2F9X13A9blJonTdaU7DtokJk%2Fimg.png)
-
-iii. Judge gesture.
-
-iv. Execute a command that matches the gesture.
-
-
-2. Points to Note
-
-i. We need to know how computers judge our gestures.
-
-## Requirements(with versions)
----
-1. python(3.9.12)
-2. opencv(4.10)
-3. cv2(4.60)
-4. mediapipe(0.9.0.1)
-5. math
+- [인식 코드](recgnize_gesture.py)
+- [MediaPipe 손 추적 참고 문서](https://google.github.io/mediapipe/solutions/hands.html)

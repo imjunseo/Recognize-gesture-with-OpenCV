@@ -1,46 +1,64 @@
 import cv2
 import mediapipe as mp
-import math
 
-draw = mp.solutions.drawing_utils
-cap = cv2.VideoCapture(0)
-hand = mp.solutions.hands()
-hand2 = hand.Hands()
 
-def point(x1, y1, x2, y2):
-    return math.sqrt(math.pow(x1 - x2,2)) + math.sqrt(math.pow(y1 - y2,2))
+FINGER_JOINTS = ((18, 4), (6, 8), (10, 12), (14, 16), (18, 20))
+GESTURES = {
+    (True, True, True, True, True): "Open palm",
+    (False, True, True, False, False): "Victory",
+    (False, False, True, False, False): "Middle finger",
+    (False, False, False, False, True): "Pinky",
+    (True, False, False, False, False): "Thumb",
+}
 
-compare = [[18,4],[6,8],[10,12],[14,16],[18,20]]
-ref = [False,False,False,False,False]
-gesture = [[True,True,True,True,True,"Hello!"],
-           [False,True,True,False,False,"V!"],
-           [False,False,True,False,False,"Fuck you!"],
-           [False,False,False,False,True,"Good!"]]
 
-while True:
-    success,img = cap.read()
-    h,w,c = img.shape
-    RGB = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-    result = hand2.process(RGB)
-    if result.multi_hand_landmarks:
-        for handLms in result.multi_hand_landmarks:
-            for i in range(0.5):
-                ref[i] = point(handLms.landmark[0].x,handLms.landmark[0].y,
-                         handLms.landmark[compare[i][0]].x,handLms.landmark[compare[i][0]].y) < point(handLms.landmark[0].x,handLms.landmark[0].y,
-                         handLms.landmark[compare[i][1]].x,handLms.landmark[compare[i][1]].y)
-            print(ref)
-            text_x = (handLms.landmark[0].x*w)
-            text_y = (handLms.landmark[0].y*h)
-            for i in range(0,len(gesture)):
-                reg = True
-                for j in range(0,5):
-                    if(gesture[i][j] != ref[j]):
-                        reg = False
-                if(reg == True):
-                    cv2.putText(img,gesture[i][5],(round(text_x) - 50,round(text_y) - 250),
-                                cv2.FONT_HERSHEY_PLAIN,4,(0,0,0),4)
-            draw.draw_landmarks(img,handLms,hand.HAND_CONNECTIONS)
+def distance(first, second):
+    return abs(first.x - second.x) + abs(first.y - second.y)
 
-    cv2.imshow("Gesture Recognition",img)
-    cv2.waitKey(1)
-                    
+
+def recognize_gesture(landmarks):
+    wrist = landmarks[0]
+    extended = tuple(
+        distance(wrist, landmarks[joint]) < distance(wrist, landmarks[tip])
+        for joint, tip in FINGER_JOINTS
+    )
+    return GESTURES.get(extended)
+
+
+def main():
+    camera = cv2.VideoCapture(0)
+    hands = mp.solutions.hands
+    try:
+        if not camera.isOpened():
+            raise SystemExit("Unable to open webcam 0.")
+
+        with hands.Hands() as tracker:
+            while True:
+                success, frame = camera.read()
+                if not success:
+                    raise SystemExit("Unable to read a frame from webcam 0.")
+
+                height, width = frame.shape[:2]
+                result = tracker.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+                for landmarks in result.multi_hand_landmarks or ():
+                    label = recognize_gesture(landmarks.landmark)
+                    if label is not None:
+                        wrist = landmarks.landmark[0]
+                        position = (max(0, int(wrist.x * width) - 50),
+                                    max(25, int(wrist.y * height) - 30))
+                        cv2.putText(frame, label, position, cv2.FONT_HERSHEY_SIMPLEX,
+                                    0.8, (255, 255, 255), 2)
+                    mp.solutions.drawing_utils.draw_landmarks(
+                        frame, landmarks, hands.HAND_CONNECTIONS
+                    )
+
+                cv2.imshow("Gesture Recognition", frame)
+                if (cv2.waitKey(1) & 0xFF) in (ord("q"), ord("Q"), 27):
+                    break
+    finally:
+        camera.release()
+        cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    main()
